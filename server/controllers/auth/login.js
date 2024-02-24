@@ -1,7 +1,7 @@
 const joi = require('joi')
-const bcrypt = require('bcrypt')
+const bcrypt = require('bcryptjs')
 const Account = require('../../models/Account')
-const {signToken} = require('../../middlewares/jsonwebtoken')
+const { signToken } = require('../../middlewares/jsonwebtoken')
 
 async function login(request, response, next) {
   try {
@@ -20,10 +20,10 @@ async function login(request, response, next) {
   }
 
   try {
-    const {username, password} = request.body
+    const { username, password } = request.body
 
     // Get account from DB, and verify existance
-    const foundAccount = await Account.findOne({username})
+    const foundAccount = await Account.findOne({ username })
     if (!foundAccount) {
       return response.status(400).json({
         message: 'Bad credentials',
@@ -43,7 +43,7 @@ async function login(request, response, next) {
     delete foundAccount.password
 
     // Generate access token
-    const token = signToken({uid: foundAccount._id, role: foundAccount.role})
+    const token = signToken({ uid: foundAccount._id, role: foundAccount.role })
 
     response.status(200).json({
       message: 'Succesfully logged-in',

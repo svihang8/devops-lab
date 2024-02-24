@@ -1,4 +1,6 @@
 const ORIGIN = '*'
+const path = require('path')
+require('dotenv').config({ path: path.resolve(__dirname, '../.env') })
 const PORT = process.env.PORT || 8080
 
 // for "atlas" edit MONGO_URI in -> .env file || for "community server" edit <MyDatabase>
