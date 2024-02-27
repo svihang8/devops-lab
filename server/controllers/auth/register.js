@@ -1,60 +1,39 @@
-const joi = require('joi')
-const bcrypt = require('bcryptjs')
-const Account = require('../../models/Account')
-const { signToken } = require('../../middlewares/jsonwebtoken')
+const Joi = require('joi');
+const Account = require('../../models/Account');
 
-async function register(request, response, next) {
+/*
+register function takes in parameters, validates their type, and creates an document
+in Account.
+*/
+const register = async (req, res, next) => {
   try {
-    // Validate request data
-    await joi
-      .object({
-        username: joi.string().required(),
-        password: joi.string().required(),
-      })
-      .validateAsync(request.body)
-  } catch (error) {
-    return response.status(400).json({
-      error: 'ValidationError',
-      message: error.message,
+    const { username, password, email } = req.body;
+    const validationSchema = Joi.object({
+      username: Joi.string(),
+      password: Joi.string(),
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    });
+    let { error, value } = await validationSchema.validateAsync({
+      username: username,
+      password: password,
+      email: email
     })
-  }
-
-  try {
-    const { username, password } = request.body
-
-    // Verify account username as unique
-    const existingAccount = await Account.findOne({ username })
-    if (existingAccount) {
-      return response.status(400).json({
-        error: username,
-        message: 'An account already exists with that "username"',
-      })
+    if (error) {
+      res.status(400).json({ 'message': value });
+      return;
     }
-
-    // Encrypt password
-    const salt = await bcrypt.genSalt(10)
-    const hash = await bcrypt.hash(password, salt)
-
-    // Create account
-    const newAccount = new Account({ username, password: hash })
-    await newAccount.save()
-
-    // Remove password from response data
-    newAccount.password = undefined
-    delete newAccount.password
-
-    // Generate access token
-    const token = signToken({ uid: newAccount._id, role: newAccount.role })
-
-    response.status(201).json({
-      message: 'Succesfully registered',
-      data: newAccount,
-      token,
-    })
+    const document = await Account.create({
+      username: username, password: password, email: email
+    });
+    res.status(200).json({
+      'message': 'success',
+      'user': document,
+    });
+    next();
   } catch (error) {
-    console.error(error)
-    return response.status(500).send()
+    res.status(500).send();
   }
-}
+};
 
-module.exports = register
+module.exports = register;
