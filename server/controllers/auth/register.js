@@ -2,7 +2,7 @@ const Joi = require('joi');
 const Account = require('../../models/Account');
 
 /*
-register function takes in parameters, validates their type, and creates an document
+register takes in parameters, validates their type, and creates an document
 in Account.
 */
 const register = async (req, res, next) => {

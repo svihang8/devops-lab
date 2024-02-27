@@ -1,59 +1,41 @@
-const joi = require('joi')
+const joi = require('joi');
 const bcrypt = require('bcryptjs')
-const Account = require('../../models/Account')
-const { signToken } = require('../../middlewares/jsonwebtoken')
+const Account = require('../../models/Account');
 
-async function login(request, response, next) {
+/*
+login takes in parameters, validates their type, matches uid and password, and
+logs in.
+*/
+const login = async (req, res, next) => {
   try {
-    // Validate request data
-    await joi
-      .object({
-        username: joi.string().required(),
-        password: joi.string().required(),
-      })
-      .validateAsync(request.body)
-  } catch (error) {
-    return response.status(400).json({
-      error: 'ValidationError',
-      message: error.message,
+    const { email, password } = req.body;
+    const validationSchema = Joi.object({
+      password: Joi.string(),
+      email: Joi.string()
+        .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
+    });
+    let { error, value } = await validationSchema.validateAsync({
+      password: password,
+      email: email
     })
-  }
-
-  try {
-    const { username, password } = request.body
-
-    // Get account from DB, and verify existance
-    const foundAccount = await Account.findOne({ username })
-    if (!foundAccount) {
-      return response.status(400).json({
-        message: 'Bad credentials',
-      })
+    if (error) {
+      res.status(400).json({ 'message': value });
+      return;
     }
 
-    // Decrypt and verify password
-    const passOk = await bcrypt.compare(password, foundAccount.password)
-    if (!passOk) {
-      return response.status(400).json({
-        message: 'Bad credentials',
-      })
+    const document = await Account.findOne({ email: email, password: password });
+
+    if (!document) {
+      res.status(400).json({ 'message': 'invalid email or password' });
+      return;
     }
 
-    // Remove password from response data
-    foundAccount.password = undefined
-    delete foundAccount.password
+    res.status(200).json({ 'message': 'success', 'user': document });
 
-    // Generate access token
-    const token = signToken({ uid: foundAccount._id, role: foundAccount.role })
+    next();
 
-    response.status(200).json({
-      message: 'Succesfully logged-in',
-      data: foundAccount,
-      token,
-    })
   } catch (error) {
-    console.error(error)
-    response.status(500).send()
+    res.status(500).send();
   }
-}
+};
 
-module.exports = login
