@@ -1,5 +1,4 @@
 const joi = require('joi');
-const bcrypt = require('bcryptjs')
 const Account = require('../../models/Account');
 
 /*
