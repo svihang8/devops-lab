@@ -1,8 +1,5 @@
-const bcrypt = require('bcrypt');
+const bcrypt = require('bcrypt')
 const saltRounds = 10;
-const myPlaintextPassword = 's0/\/\P4$$w0rD';
-const someOtherPlaintextPassword = 'not_bacon';
-
 /*
 encrypt inputs a string and returns a hash of a string using bcrypt.
 */

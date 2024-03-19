@@ -5,10 +5,11 @@
   "main": "index.js",
   "license": "ISC",
   "scripts": {
-    "start": "nodemon index.js || node index.js"
+    "start": "nodemon index.js || node index.js",
+    "test": "jest"
   },
   "dependencies": {
-    "bcryptjs": "^2.4.3",
+    "bcrypt": "^5.1.1",
     "cors": "^2.8.5",
     "dotenv": "^10.0.0",
     "express": "^4.17.1",
@@ -17,6 +18,7 @@
     "mongoose": "^6.0.12"
   },
   "devDependencies": {
+    "jest": "^29.7.0",
     "nodemon": "^2.0.14"
   }
 }
