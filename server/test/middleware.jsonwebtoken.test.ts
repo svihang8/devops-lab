@@ -1,0 +1,33 @@
+import { NextFunction, Request, Response } from 'express';
+import { signToken, verifyToken } from '../middlewares/jsonwebtoken';
+import '@types/jest';
+/*
+signToken
+--> token matches signed one
+verifyToken
+--> if token is not passed, test if 401 error sent
+--> if invalid token is passed, test if 401 error sent
+--> if valid token is passed, test if next is executed
+--> after specified time, token must be invalid
+*/
+describe('testing signing of token', () => {
+    const testPayload = {
+        'username': 'defaultUsername',
+        'role': 'defaultRole'
+    }
+    test('token signed successfully', () => {
+        expect(typeof signToken(testPayload)).toBe('string');
+    })
+});
+
+describe('testing verification of token', () => {
+    let testRequest: Partial<Request>; // partial makes ts properties optional on Request interface
+    let testResponse: Partial<Response>;
+    let testNextFunction: NextFunction = jest.fn();
+    beforeEach(() => {
+        testRequest = {};
+        testResponse = {};
+    });
+
+    test('')
+})
