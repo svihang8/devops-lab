@@ -1,7 +1,7 @@
 const PASSWORD_1 = 'password_1'
 const HASHED_PASSWORD_1 = '$2a$10$7okJvKk14pi8UF/VzdEqr.mma68ocOKAp/uRwFcO2pk5xwVYRa5OW';
 const PASSWORD_2 = 'password_2'
-const { encrypt, compare } = require('../utils/bcrypt');
+import { encrypt, compare } from '../src/utils/bcrypt';
 
 describe('testing encryption', () => {
     test('password encrypted successfully', async () => {

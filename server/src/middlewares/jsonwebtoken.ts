@@ -1,11 +1,11 @@
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET } = require('../constants');
+import * as jwt from 'jsonwebtoken';
+import { constants } from '../constants';
+import { Request, Response, NextFunction } from 'express';
 
 
 const signToken = (payload = {}, expiresIn = '12hr') => {
   try {
-    console.log(JWT_SECRET);
-    const token = jwt.sign(payload, JWT_SECRET, { expiresIn: expiresIn })
+    const token = jwt.sign(payload, constants['JWT_SECRET'], { expiresIn: expiresIn })
 
     return token;
 
@@ -14,7 +14,7 @@ const signToken = (payload = {}, expiresIn = '12hr') => {
   }
 };
 
-const verifyToken = (req, res, next) => {
+const verifyToken = (req: Request, res: Response, next: NextFunction) => {
   try {
     const { token } = req.body;
 
@@ -24,7 +24,7 @@ const verifyToken = (req, res, next) => {
       });
     }
 
-    const auth = jwt.verify(token, JWT_SECRET);
+    const auth = jwt.verify(token, constants['JWT_SECRET']);
 
     if (!auth) {
       res.status(401).json({
@@ -32,7 +32,7 @@ const verifyToken = (req, res, next) => {
       })
     }
 
-    req.auth = auth;
+    req.body.auth = auth;
 
     next();
 

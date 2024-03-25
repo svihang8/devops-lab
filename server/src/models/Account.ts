@@ -1,9 +1,10 @@
-const mongoose = require('mongoose')
+import * as mongoose from 'mongoose';
+import { Portfolio } from './Portfolio';
 
 /*
 validate if email matches regex expression
 */
-const validateEmail = (email) => {
+const validateEmail = (email: string) => {
   const RE = /^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/;
   return RE.test(email)
 }
@@ -11,12 +12,8 @@ const validateEmail = (email) => {
 /*
 schema definition of Account model
 */
-const instance = new mongoose.Schema(
+const INSTANCE: mongoose.Schema = new mongoose.Schema(
   {
-    /*
-      document ID is set by default via MongoDB - next line is deprecated
-      _id: mongoose.Schema.Types.ObjectId,
-    */
     username: {
       type: String,
       required: true,
@@ -50,6 +47,6 @@ const instance = new mongoose.Schema(
   },
 )
 
-const modelName = 'Account'
+const MODEL_NAME: string = 'Account'
 
-module.exports = mongoose.model(modelName, instance)
+export const Account = mongoose.model(MODEL_NAME, INSTANCE);
