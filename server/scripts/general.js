@@ -1,0 +1,1 @@
+console.log(setTimeout(() => { console.log('happen') }, 1000));

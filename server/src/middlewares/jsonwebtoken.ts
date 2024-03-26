@@ -3,7 +3,7 @@ import { constants } from '../constants';
 import { Request, Response, NextFunction } from 'express';
 
 
-const signToken = (payload = {}, expiresIn = '12hr') => {
+export const signToken = (payload: string | Buffer | object = {}, expiresIn = '12hr') => {
   try {
     const token = jwt.sign(payload, constants['JWT_SECRET'], { expiresIn: expiresIn })
 
@@ -14,31 +14,32 @@ const signToken = (payload = {}, expiresIn = '12hr') => {
   }
 };
 
-const verifyToken = (req: Request, res: Response, next: NextFunction) => {
+export const verifyToken = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { token } = req.body;
 
     if (!token) {
       res.status(401).json({
-        message: 'missing JWT'
+        message: 'token missing'
       });
     }
 
-    const auth = jwt.verify(token, constants['JWT_SECRET']);
+    let auth: string | jwt.JwtPayload;
 
-    if (!auth) {
-      res.status(401).json({
-        message: 'JWT not valid'
-      })
+    try {
+      auth = jwt.verify(token, constants['JWT_SECRET'])
+      req.body.auth = auth;
+      next();
+    } catch (error) {
+      if (error instanceof jwt.TokenExpiredError) {
+        res.status(401).json({
+          message: 'token expired'
+        })
+      }
     }
 
-    req.body.auth = auth;
-
-    next();
-
   } catch (error) {
-    res.status(500).send();
+    console.error(error);
+    res.status(500).json();
   }
 };
-
-module.exports = { signToken, verifyToken };

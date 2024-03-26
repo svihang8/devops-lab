@@ -1,6 +1,7 @@
 import * as path from 'path';
 require('dotenv').config({ path: path.resolve(__dirname, `../../.env`) });
-require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${process.env.NODE_ENV}`) });
+const NODE_ENV: string | undefined = process.env.NODE_ENV;
+require('dotenv').config({ path: path.resolve(__dirname, `../../.env.${NODE_ENV}`) });
 
 export interface Constants {
   ORIGIN: string,
@@ -20,4 +21,3 @@ export class Constants {
 
 
 export let constants = new Constants();
-
