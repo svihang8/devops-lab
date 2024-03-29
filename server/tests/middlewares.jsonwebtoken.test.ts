@@ -1,13 +1,6 @@
 import { signToken, verifyToken } from '../src/middlewares/jsonwebtoken';
 import { constants } from '../src/constants';
 import { Request, Response, NextFunction } from 'express';
-/*
-signToken should return a string type value
-verifyToken use cases:
---> signed token generated should return proper credentials within req.body.auth
---> missing token should return 401 error
---> expired token should return 401 error
-**/
 
 test('JWT_TOKEN value', () => {
     expect(constants['JWT_SECRET']).toBe('test');

@@ -1,5 +1,4 @@
 import * as mongoose from 'mongoose';
-import { Portfolio } from './Portfolio';
 
 /*
 validate if email matches regex expression
@@ -32,7 +31,10 @@ const INSTANCE: mongoose.Schema = new mongoose.Schema(
       required: true,
     },
     portfolios: {
-      type: [Portfolio],
+      type: [{
+        type: mongoose.Schema.Types.ObjectId,
+        ref: 'Portfolio'
+      }],
       default: []
     },
     role: {

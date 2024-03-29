@@ -5,6 +5,7 @@ export interface MongoDB {
   mongoose: mongoose.Mongoose,
   isConnected: Boolean,
   MONGO_URI: string,
+  db?: mongoose.Mongoose,
 };
 
 export class MongoDB {
@@ -12,14 +13,15 @@ export class MongoDB {
     this.mongoose = mongoose
     this.isConnected = false
     this.MONGO_URI = constants['MONGO_URI']
+    this.db = undefined;
   }
 
   async connect() {
     if (this.isConnected) return
 
     try {
-      const db: mongoose.Mongoose = await this.mongoose.connect(this.MONGO_URI);
-      const connection: mongoose.Connection = db.connection
+      this.db = await this.mongoose.connect(this.MONGO_URI);
+      const connection: mongoose.Connection = this.db.connection
 
       this.isConnected = connection.readyState === 1
       if (this.isConnected) console.log('MongoDB connected')

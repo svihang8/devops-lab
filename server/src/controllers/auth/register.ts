@@ -7,7 +7,7 @@ import { Document } from 'mongoose';
 register takes in parameters, validates their type, and creates an document
 in Account.
 */
-const register = async (req: Request, res: Response, next: NextFunction) => {
+export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
     const { USERNAME, PASSWORD, EMAIL } = req.body;
 
@@ -46,5 +46,3 @@ const register = async (req: Request, res: Response, next: NextFunction) => {
     res.status(500).send();
   }
 };
-
-module.exports = register;
