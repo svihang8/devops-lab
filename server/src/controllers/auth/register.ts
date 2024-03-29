@@ -9,40 +9,50 @@ in Account.
 */
 export const register = async (req: Request, res: Response, next: NextFunction) => {
   try {
-    const { USERNAME, PASSWORD, EMAIL } = req.body;
+    const { username, password, email } = req.body;
 
     const VALIDATION_SCHEMA: Joi.ObjectSchema = Joi.object({
-      'username': Joi.string(),
-      'password': Joi.string(),
-      'email': Joi.string()
+      'username': Joi.string().required(),
+      'password': Joi.string().required(),
+      'email': Joi.string().required()
         .email({ minDomainSegments: 2, tlds: { allow: ['com', 'net'] } })
     });
 
-    let validationError: Joi.ValidationError;
-
-    let { error, value } = await VALIDATION_SCHEMA.validateAsync({
-      'username': USERNAME,
-      'password': PASSWORD,
-      'email': EMAIL
+    const { value, error } = VALIDATION_SCHEMA.validate({
+      'username': username,
+      'password': password,
+      'email': email
     });
-    validationError = error;
 
-    if (validationError) {
-      res.status(400).json({ 'message': validationError });
-      return;
+    if (error) {
+      res.status(422).json({
+        "message": "error",
+        "error": "missing username, email, or password"
+      });
+    }
+
+    const accountExists = await Account.findOne({
+      email: email
+    });
+
+    if (accountExists) {
+      res.status(409).json({
+        "message": "error",
+        "error": "account already exists"
+      })
     }
 
     const DOCUMENT: Document = await Account.create({
-      username: USERNAME, password: PASSWORD, email: EMAIL
+      username: username, password: password, email: email
     });
 
     res.status(200).json({
       'message': 'success',
-      'user': DOCUMENT,
+      'user': 'account successfully created'
     });
 
     next();
   } catch (error) {
-    res.status(500).send();
+    res.status(500).json();
   }
 };
