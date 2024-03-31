@@ -24,11 +24,11 @@ export class MongoDB {
       const connection: mongoose.Connection = this.db.connection
 
       this.isConnected = connection.readyState === 1
-      if (this.isConnected) console.log('MongoDB connected')
+      // if (this.isConnected) console.log('MongoDB connected')
 
-      connection.on('connected', () => console.log(' MongoDB connected')) // re-connected
-      connection.on('disconnected', () => console.log('MongoDB disconnected')) // disconnected
-      connection.on('error', (error) => console.log('MongoDB connection error', error)) // listen for errors during the session
+      // connection.on('connected', () => console.log(' MongoDB connected')) // re-connected
+      // connection.on('disconnected', () => console.log('MongoDB disconnected')) // disconnected
+      // connection.on('error', (error) => console.log('MongoDB connection error', error)) // listen for errors during the session
     } catch (error) {
       try {
         if (error instanceof Error) console.log('MongoDB connection error:', error.message)

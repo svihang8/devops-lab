@@ -1,10 +1,10 @@
-import { register } from '../src/controllers/auth/register';
+import { login } from '../src/controllers/auth/login';
 import { encrypt } from '../src/utils/bcrypt';
 import { Request, Response, NextFunction } from 'express';
 import { Account } from '../src/models/Account';
 import { mongo } from '../src/utils/mongo';
 
-describe('testing registration of account', () => {
+describe('testing login of account', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction = jest.fn();
@@ -19,6 +19,12 @@ describe('testing registration of account', () => {
     beforeAll(async () => {
         await mongo.connect();
         await Account.deleteMany({});
+        const hashedPassword = await encrypt(testAccount['password']);
+        await Account.create({
+            'username': testAccount['username'],
+            'email': testAccount['email'],
+            'password': hashedPassword
+        });
     });
 
     afterAll(async () => {
@@ -34,44 +40,49 @@ describe('testing registration of account', () => {
             json: jest.fn(),
             status: jest.fn().mockReturnThis(),
         };
-        await Account.deleteMany({});
-    });
-
-    afterEach(async () => {
-        await Account.deleteMany({});
     });
 
     test('missing parameters', async () => {
         expectedResponseJson = {
             'message': 'error',
-            'error': 'missing username, email, or password',
+            'error': 'missing email or password',
         };
         expectedResponseStatus = 422;
-        await register(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        await login(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(mockResponse.json).toHaveBeenCalledWith(expectedResponseJson);
         expect(mockResponse.status).toHaveBeenCalledWith(expectedResponseStatus);
     });
 
-    test('account already exists', async () => {
+    test('invalid email', async () => {
         expectedResponseJson = {
             'message': 'error',
-            'error': 'account already exists',
+            'error': 'invalid email',
         }
-        expectedResponseStatus = 409;
+        expectedResponseStatus = 400;
         mockRequest = {
             body: {
-                'username': testAccount['username'],
-                'email': testAccount['email'],
+                'email': 'test2@email.com',
                 'password': testAccount['password'],
             }
         }
-        const hashedPassword = await encrypt(testAccount['password']);
-        await Account.create({
-            'username': testAccount['username'],
-            'email': testAccount['email'],
-            'password': hashedPassword
-        });
-        await register(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        await login(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
+        expect(mockResponse.json).toHaveBeenCalledWith(expectedResponseJson);
+        expect(mockResponse.status).toHaveBeenCalledWith(expectedResponseStatus);
+    });
+
+    test('invalid password', async () => {
+        expectedResponseJson = {
+            'message': 'error',
+            'error': 'invalid password',
+        }
+        expectedResponseStatus = 400;
+        mockRequest = {
+            body: {
+                'email': testAccount['email'],
+                'password': 'test2',
+            }
+        }
+        await login(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(mockResponse.json).toHaveBeenCalledWith(expectedResponseJson);
         expect(mockResponse.status).toHaveBeenCalledWith(expectedResponseStatus);
     });
@@ -79,19 +90,18 @@ describe('testing registration of account', () => {
     test('successful request', async () => {
         expectedResponseJson = {
             'message': 'success',
-            'user': 'account successfully created'
+            'user': 'account successfully logged in'
         };
         expectedResponseStatus = 200;
         mockRequest = {
             body: {
-                'username': testAccount['username'],
                 'email': testAccount['email'],
                 'password': testAccount['password'],
             }
         }
-        await register(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
-        expect(mockResponse.status).toHaveBeenCalledWith(expectedResponseStatus);
+        await login(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(mockResponse.json).toHaveBeenCalledWith(expectedResponseJson);
+        expect(mockResponse.status).toHaveBeenCalledWith(expectedResponseStatus);
     });
 
 });
