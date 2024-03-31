@@ -20,6 +20,7 @@ describe('testing verification of token', () => {
     let mockRequest: Partial<Request>;
     let mockResponse: Partial<Response>;
     let nextFunction: NextFunction = jest.fn();
+    let expectedRequestBody: object;
     let expectedResponseJson: object;
     let expectedResponseStatus: number;
 
@@ -68,7 +69,11 @@ describe('testing verification of token', () => {
     });
 
     test('valid token', async () => {
-        expectedResponseJson = {}
+        expectedRequestBody = {
+            auth: {
+                'email': 'test@email.com'
+            }
+        }
         const token = signToken(testPayload);
         mockRequest = {
             body: {
@@ -77,7 +82,6 @@ describe('testing verification of token', () => {
         }
         verifyToken(mockRequest as Request, mockResponse as Response, nextFunction as NextFunction);
         expect(nextFunction).toHaveBeenCalledTimes(1);
-
     });
 
 })

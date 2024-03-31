@@ -27,7 +27,7 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const DOCUMENT: Document | null = await Account.findOne({ 'email': email });
-    console.log(DOCUMENT);
+
     if (!DOCUMENT) {
       res.status(400).json({
         'message': 'error',
@@ -36,9 +36,9 @@ export const login = async (req: Request, res: Response, next: NextFunction) => 
     }
 
     const hashedPassword = DOCUMENT?.toObject()['password'];
-    console.log(`hashed password\n${hashedPassword}`)
+
     const isValid = await compare(password, hashedPassword);
-    console.log(`valid?\n${isValid}`)
+
     if (!isValid) {
       res.status(400).json({
         'message': 'error',
