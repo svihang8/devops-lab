@@ -11,8 +11,8 @@
 .DS_Store
 .env
 .env.development
-.env.staging
 .env.test
+.env.staging
 .eslintcache
 
 npm-debug.log*
